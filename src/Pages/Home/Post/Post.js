@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Post = () => {
+const Post = ({data}) => {
     return (
         <div className="container mx-auto shadow-xl border my-5">
         <div className="post">
@@ -8,42 +8,39 @@ const Post = () => {
             <div className="profile-img">
               <img
                 className="w-20 h-20 border rounded-[50%]"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK_vjpKVAjkub5O0sFL7ij3mIzG-shVt-6KKLNdxq4&s"
+                src={data?.photoURL}
                 alt=""
               />
             </div>
             <div className="profile-name">
-              <h3 className="text-[#050505] text-lg font-medium">Md Imtias</h3>
+              <h3 className="text-[#050505] text-lg font-medium">{data?.displayName}</h3>
               <p className="text-gray-500 text-sm ">
-                Published Date: December 28 2022
+                Published Date: {data?.created}
               </p>
             </div>
           </div>
           <div className="post-content px-5">
             <p>
-              We are looking for a MERN stack developer to build a web
-              application where the general people can post images and their
-              writings. It will be like social media with important
-              functionalities.
+              {data?.paragraph}
             </p>
           </div>
           <div className="post-image py-5">
             <img
-              src="https://scontent.fcgp6-1.fna.fbcdn.net/v/t39.30808-6/322395132_1302850253885947_79467866825911563_n.jpg?stp=dst-jpg_s720x720&_nc_cat=103&ccb=1-7&_nc_sid=8bfeb9&_nc_ohc=xo_ExaVYZZYAX-xcQGH&_nc_ht=scontent.fcgp6-1.fna&oh=00_AfDtdrVKUV8leDsKQUqYHCUOsN_qSskVUnVWr-DM_awbjw&oe=63B00E7C"
+              src={data?.postImage}
               className="w-full h-auto"
               alt=""
             />
           </div>
           <div className="post-count-like-comment-share flex justify-between px-5 pb-5">
             <div className="like-count">
-              <p className="md:ml-20">250 Like</p>
+              <p className="md:ml-20">{data?.like} Like</p>
             </div>
             <div className="comment-and-share flex flex-start gap-5">
               <div className="comment-count">
-                <p>15 Comments</p>
+                <p>{data?.comment} Comments</p>
               </div>
               <div className="share-count">
-                <p>2 Share</p>
+                <p>{data?.share} Share</p>
               </div>
             </div>
           </div>
