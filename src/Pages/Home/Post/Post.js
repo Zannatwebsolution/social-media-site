@@ -1,10 +1,29 @@
-import React, { useContext } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { AuthContext } from '../../../context/AuthProvider';
 
 const Post = ({data}) => {
   const {user} = useContext(AuthContext)
+  const [commentBox, setCommentBox] = useState(false)
+  const [viewMoreComment, setViewMoreComment] = useState(false) 
+  const [commentData, setCommentData] = useState(false) 
+  const [commentValue, setCommentValue] = useState(false)
   // const [likes, setLikes] = useState(40);
   // const [liked, setLiked] = useState(true);
+  const { data: posts = [], refetch, isLoading } = useQuery({
+    queryKey: ["users", commentData[0] ],
+    queryFn: async () => {
+      const res = await fetch(`http://localhost:5000/posts`, {
+        headers: {
+          authorization: localStorage.getItem("token"),
+        },
+      });
+      const data = await res.json();
+      return data;
+    },
+  });
+
   const onSelect = async (liked)=>{
     const response =   await fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
       method: "PUT",
@@ -17,6 +36,52 @@ const Post = ({data}) => {
     const postData = await response.json();
     console.log(postData)
   }
+
+  const commentBoxHandler = ()=>{
+    setCommentBox(!commentBox)
+  }
+
+  const commentHandler = async ()=>{
+    const response =   await fetch(`http://localhost:5000/post-comment/${data._id}?email=${user?.email}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `token ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify({comment: commentValue, displayName: user?.displayName, photoURL: user?.photoURL})
+    })
+    const postData = await response.json();
+    if(postData.modifiedCount > 0){
+      toast.success("Comment add successful");
+      refetch();
+    }
+  }
+useEffect(()=>{
+  async function fetchData (){
+    const response = await fetch(`http://localhost:5000/post-comment/${data._id}?email=${user?.email}`, {
+      headers: {
+        authorization: `token ${localStorage.getItem("token")}`
+      }
+    })
+    const commentDataAll = await response.json();
+    setCommentData(commentDataAll)
+  }
+  fetchData()
+  // fetch(`http://localhost:5000/post-comment/${data._id}?email=${user?.email}`, {
+  //     headers: {
+  //       authorization: `token ${localStorage.getItem("token")}`
+  //     }
+  //   })
+  //   .then(res=>res.json())
+  //   .then(data=>setCommentData(data))
+}, [ setCommentData, viewMoreComment, data, user])
+
+  const viewCommentHandler = async ()=>{
+    setViewMoreComment(!viewMoreComment)
+    console.log(data.id)
+  }
+
+ 
   //   if(liked){
   //     // setLikes(likes + 1)
   //  const response =   await fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
@@ -111,7 +176,7 @@ const Post = ({data}) => {
               </button>
             </div>
             <div className="comment">
-              <button className="btn">
+              <button className="btn" onClick={commentBoxHandler}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -128,6 +193,9 @@ const Post = ({data}) => {
                 </svg>{" "}
                 Comment
               </button>
+            </div>
+            <div className="show-comment">
+              <button className="btn" type="submit" onClick={viewCommentHandler}>{viewMoreComment ? "Hide Comment" : "Show Comment"}</button>
             </div>
             <div className="share">
               <button className="btn">
@@ -150,6 +218,21 @@ const Post = ({data}) => {
             </div>
           </div>
         </div>
+        {commentBox && <div className="comment-section">
+          <div className="write-comment p-5">
+            <textarea type="textarea" placeholder='write comment' cols="10" rows="2" onChange={e=>setCommentValue(e.target.value)} className='textarea textarea-bordered w-full'/>
+            <button type="submit" className='btn mt-5 block w-[300px] text-center' onClick={commentHandler}>Submit</button>
+          </div>
+        </div>}
+       {viewMoreComment &&  <div className="view-more-comment-section p-5">
+          {commentData[0]?.userComment?.map((comment, index)=><div key={index} className="flex items-center my-5 rounded-xl border bg-[#F0F2F5]">
+            <img className='w-12 h-12 rounded-[50%] border m-5' src={comment.photoURL || "https://img.icons8.com/emoji/96/null/man-with-beard-light-skin-tone.png"} alt="" />
+            <div className="comment-name-and-text bg-[#F0F2F5] p-5 rounded-xl">
+              <h3 className='font-bold text-xl text-black py-1'>{comment.displayName}</h3>
+              <p>{comment.comment}</p>
+            </div>
+          </div>)}
+        </div>}
       </div>
     );
 };
