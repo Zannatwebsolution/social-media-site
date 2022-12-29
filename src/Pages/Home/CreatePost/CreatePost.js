@@ -22,7 +22,7 @@ const CreatePost = () => {
     }else{
        imageUploadServer = "";
     }
- const data = {displayName: user?.displayName, email: user?.email, photoURL: user?.photoURL, like: 0, comment:0, share:0, paragraph, postImage: imageUploadServer, created: new Date()};
+ const data = {displayName: user?.displayName, email: user?.email, photoURL: user?.photoURL, liked: true, like: 0, comment:0, share:0, paragraph, postImage: imageUploadServer, created: new Date()};
 
       fetch("http://localhost:5000/posts/", {
         method: "POST",

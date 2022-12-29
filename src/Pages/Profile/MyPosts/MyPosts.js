@@ -11,7 +11,7 @@ const MyPosts = () => {
       })
         .then((res) => res.json())
         .then((data) => setMyPost(data));
-    }, [user?.email]);
+    }, [user, setMyPost]);
     return (
         <div className="top-post pt-5 px-2 md:px-0">
             {myPost.reverse().map((post)=><Post key={post._id} data={post}></Post>)}

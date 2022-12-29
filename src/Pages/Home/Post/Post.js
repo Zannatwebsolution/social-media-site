@@ -1,6 +1,52 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from '../../../context/AuthProvider';
 
 const Post = ({data}) => {
+  const {user} = useContext(AuthContext)
+  // const [likes, setLikes] = useState(40);
+  // const [liked, setLiked] = useState(true);
+  const onSelect = async (liked)=>{
+    const response =   await fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
+      method: "PUT",
+      headers: {
+        "content-type": "application/json",
+        authorization: `token ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify(data)
+    })
+    const postData = await response.json();
+    console.log(postData)
+  }
+  //   if(liked){
+  //     // setLikes(likes + 1)
+  //  const response =   await fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "content-type": "application/json",
+  //         authorization: `token ${localStorage.getItem("token")}`
+  //       },
+  //       body: JSON.stringify(data)
+  //     })
+  //     const postData = response.json();
+  //     console.log(postData)
+  //   }else{
+  //     // setLikes(likes -1);
+  //     fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "content-type": "application/json",
+  //         authorization: `token ${localStorage.getItem("token")}`
+  //       },
+  //       body: JSON.stringify(data)
+  //     })
+  //   }
+    // setLiked(!liked)
+  // }
+  // useEffect(()=>{
+  
+  //   console.log("b", likes)
+  // }, [likes, liked, data._id])
+
     return (
         <div className="container mx-auto shadow-xl border my-5">
         <div className="post">
@@ -46,7 +92,7 @@ const Post = ({data}) => {
           </div>
           <div className="post-share flex justify-around py-5 border-t border-slate-300">
             <div className="like">
-              <button className="btn">
+              <button className="btn" onClick={()=>onSelect()}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
