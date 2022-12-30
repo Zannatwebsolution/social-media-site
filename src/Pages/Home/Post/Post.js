@@ -3,29 +3,28 @@ import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AuthContext } from '../../../context/AuthProvider';
 
-const Post = ({data}) => {
+const Post = ({data, refetch}) => {
+  // const {_id: id} = data;
+  
+  // console.log(id)
   const {user} = useContext(AuthContext)
   const [commentBox, setCommentBox] = useState(false)
   const [viewMoreComment, setViewMoreComment] = useState(false) 
   const [commentData, setCommentData] = useState(false) 
   const [commentValue, setCommentValue] = useState(false)
-  // const [likes, setLikes] = useState(40);
-  // const [liked, setLiked] = useState(true);
-  const { data: posts = [], refetch, isLoading } = useQuery({
-    queryKey: ["users", commentData[0] ],
-    queryFn: async () => {
-      const res = await fetch(`http://localhost:5000/posts`, {
-        headers: {
-          authorization: localStorage.getItem("token"),
-        },
-      });
-      const data = await res.json();
-      return data;
-    },
-  });
+  const [userLikeInfo, serUserLikeInfo] = useState({});
+
+  useEffect(()=>{
+    if(data){
+      if(data.userLiked){
+        const userInfo = data?.userLiked.find(user=>user.email === user?.email)
+        serUserLikeInfo(userInfo)
+      }
+    }
+  },[data, userLikeInfo])
 
   const onSelect = async (liked)=>{
-    const response =   await fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
+    const response =   await fetch(`https://social-media-site-server.vercel.app/post-like/${data._id}?email=${user?.email}`, {
       method: "PUT",
       headers: {
         "content-type": "application/json",
@@ -34,7 +33,12 @@ const Post = ({data}) => {
       body: JSON.stringify(data)
     })
     const postData = await response.json();
-    console.log(postData)
+    refetch();
+    const userInfo = await data.userLiked.find(user=>user.email === user?.email)
+    serUserLikeInfo(userInfo)
+   
+    return postData;
+
   }
 
   const commentBoxHandler = ()=>{
@@ -42,7 +46,7 @@ const Post = ({data}) => {
   }
 
   const commentHandler = async ()=>{
-    const response =   await fetch(`http://localhost:5000/post-comment/${data._id}?email=${user?.email}`, {
+    const response =   await fetch(`https://social-media-site-server.vercel.app/post-comment/${data._id}?email=${user?.email}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -53,64 +57,24 @@ const Post = ({data}) => {
     const postData = await response.json();
     if(postData.modifiedCount > 0){
       toast.success("Comment add successful");
-      refetch();
+      viewCommentHandler();
+      setViewMoreComment(true)
     }
   }
-useEffect(()=>{
-  async function fetchData (){
-    const response = await fetch(`http://localhost:5000/post-comment/${data._id}?email=${user?.email}`, {
+
+  const viewCommentHandler = async ()=>{
+    setViewMoreComment(!viewMoreComment)
+  fetch(`https://social-media-site-server.vercel.app/post-comment/${data._id}?email=${user?.email}`, {
       headers: {
         authorization: `token ${localStorage.getItem("token")}`
       }
     })
-    const commentDataAll = await response.json();
-    setCommentData(commentDataAll)
-  }
-  fetchData()
-  // fetch(`http://localhost:5000/post-comment/${data._id}?email=${user?.email}`, {
-  //     headers: {
-  //       authorization: `token ${localStorage.getItem("token")}`
-  //     }
-  //   })
-  //   .then(res=>res.json())
-  //   .then(data=>setCommentData(data))
-}, [ setCommentData, viewMoreComment, data, user])
-
-  const viewCommentHandler = async ()=>{
-    setViewMoreComment(!viewMoreComment)
-    console.log(data.id)
-  }
-
- 
-  //   if(liked){
-  //     // setLikes(likes + 1)
-  //  const response =   await fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "content-type": "application/json",
-  //         authorization: `token ${localStorage.getItem("token")}`
-  //       },
-  //       body: JSON.stringify(data)
-  //     })
-  //     const postData = response.json();
-  //     console.log(postData)
-  //   }else{
-  //     // setLikes(likes -1);
-  //     fetch(`http://localhost:5000/post-like/${data._id}?email=${user?.email}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "content-type": "application/json",
-  //         authorization: `token ${localStorage.getItem("token")}`
-  //       },
-  //       body: JSON.stringify(data)
-  //     })
-  //   }
-    // setLiked(!liked)
-  // }
-  // useEffect(()=>{
+    .then(res=>res.json())
+    .then(data=> {
+      setCommentData(data[0].userComment?.reverse())
+    })
   
-  //   console.log("b", likes)
-  // }, [likes, liked, data._id])
+  }
 
     return (
         <div className="container mx-auto shadow-xl border my-5">
@@ -148,7 +112,7 @@ useEffect(()=>{
             </div>
             <div className="comment-and-share flex flex-start gap-5">
               <div className="comment-count">
-                <p>{data?.comment} Comments</p>
+                <p>{data?.userComment?.length} Comments</p>
               </div>
               <div className="share-count">
                 <p>{data?.share} Share</p>
@@ -157,7 +121,7 @@ useEffect(()=>{
           </div>
           <div className="post-share flex justify-around py-5 border-t border-slate-300">
             <div className="like">
-              <button className="btn" onClick={()=>onSelect()}>
+              <button className={userLikeInfo?.liked === true ? "btn": "btn btn-primary"} onClick={()=>onSelect()}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -225,7 +189,7 @@ useEffect(()=>{
           </div>
         </div>}
        {viewMoreComment &&  <div className="view-more-comment-section p-5">
-          {commentData[0]?.userComment?.map((comment, index)=><div key={index} className="flex items-center my-5 rounded-xl border bg-[#F0F2F5]">
+          {commentData && commentData.map((comment, index)=><div key={index} className="flex items-center my-5 rounded-xl border bg-[#F0F2F5]">
             <img className='w-12 h-12 rounded-[50%] border m-5' src={comment.photoURL || "https://img.icons8.com/emoji/96/null/man-with-beard-light-skin-tone.png"} alt="" />
             <div className="comment-name-and-text bg-[#F0F2F5] p-5 rounded-xl">
               <h3 className='font-bold text-xl text-black py-1'>{comment.displayName}</h3>

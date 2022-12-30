@@ -9,7 +9,7 @@ const Profile = () => {
     const [userInfo, setUserInfo] = useState([]);
 
     useEffect(() => {
-      fetch(`http://localhost:5000/users/${user?.email}`, {
+      fetch(`https://social-media-site-server.vercel.app/users/${user?.email}`, {
         authorization: `token ${localStorage.getItem("token")}`,
       })
         .then((res) => res.json())

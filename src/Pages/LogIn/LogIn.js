@@ -1,10 +1,13 @@
 import React, { useContext } from 'react';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthProvider';
+import { createUserDb } from '../../hooks/createUserDb';
 import banner from './../../assets/loginbanner/banner.svg';
 
 const LogIn = () => {
     const {signIn, googleSignIn} = useContext(AuthContext);
+    const navigate = useNavigate();
     const handleLogin = (e)=>{
         e.preventDefault();
         const form = e.target;
@@ -12,8 +15,15 @@ const LogIn = () => {
         const password = form.password.value;
         console.log(email, password)
         signIn(email, password)
-        .then(()=>{
+        .then((data)=>{
+            console.log(data);
+            const userDbData = {name: data.user.displayName, email: data.user.email, photoURL: data.user.photoURL}
+            createUserDb(email, userDbData)
+            .then((data)=>{
+              localStorage.setItem("token", `bearer ${data.token}`);
+            })
             toast.success("Sign In Successful");
+            navigate("./profile")
         })
         .catch(error=>{
             toast.error("Sign In Failed");
@@ -24,7 +34,13 @@ const LogIn = () => {
     const handleGoogleLogin = (e)=>{
         googleSignIn()
         .then(result=>{
-            toast.success("Login Successful")
+            const userDbData = {name: result.user.displayName, email: result.user.photoURL, photoURL: result.user.photoURL}
+            createUserDb(result.user.email, userDbData)
+            .then((data)=>{
+              localStorage.setItem("token", `bearer ${data.token}`);
+            })
+            toast.success("Login Successful");
+            navigate("/profile")
         })
         .catch(error=>toast.error("login fail, please try again"))
     }

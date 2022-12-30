@@ -6,12 +6,15 @@ const EditProfileModal = ({ modal, setModal }) => {
   const { user } = useContext(AuthContext);
   const [userInfo, setUserInfo] = useState([]);
   useEffect(() => {
-    fetch(`http://localhost:5000/users/${user?.email}`, {
-      authorization: `token ${localStorage.getItem("token")}`,
+    fetch(`https://social-media-site-server.vercel.app/users/${user?.email}`, {
+      headers: {
+        authorization: `${localStorage.getItem("token")}`,
+    }
     })
       .then((res) => res.json())
       .then((data) => setUserInfo(data[0]));
   }, [user?.email]);
+  console.log("u", userInfo)
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -30,10 +33,11 @@ const EditProfileModal = ({ modal, setModal }) => {
       updated: new Date(),
     };
     console.log(data);
-    fetch(`http://localhost:5000/users/${user?.email}`, {
+    fetch(`https://social-media-site-server.vercel.app/users/${user?.email}`, {
       method: "PUT",
       headers: {
         "content-type": "application/json",
+        authorization: `${localStorage.getItem("token")}`,
       },
       authorization: `token ${localStorage.getItem("token")}`,
       body: JSON.stringify(data),
@@ -70,7 +74,7 @@ const EditProfileModal = ({ modal, setModal }) => {
               <input
                 type="text"
                 name="name"
-                defaultValue={userInfo?.displayName}
+                defaultValue={userInfo?.name}
                 className={
                   "form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                 }

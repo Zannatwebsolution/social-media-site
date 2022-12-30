@@ -7,6 +7,8 @@ import Registration from "../Pages/Registration/Registration"
 import LogIn from "../Pages/LogIn/LogIn"
 import Profile from "../Pages/Profile/Profile"
 import EditProfileModal from "../Pages/Profile/EditProfileModal/EditProfileModal"
+import Media from "../Pages/Media/Media"
+import PrivateRoute from "./PrivateRoute/PrivateRoute"
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -31,10 +33,14 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/profile",
-                element: <Profile></Profile>
+                element: <PrivateRoute><Profile></Profile></PrivateRoute>
             },
             {
-                path: "/editprofile",
+                path: "/media",
+                element: <PrivateRoute><Media></Media></PrivateRoute>
+            },
+            {
+                path: "/edit-profile",
                 element: <EditProfileModal></EditProfileModal>
             },
         ]

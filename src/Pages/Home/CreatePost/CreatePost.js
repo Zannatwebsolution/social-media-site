@@ -22,9 +22,9 @@ const CreatePost = () => {
     }else{
        imageUploadServer = "";
     }
- const data = {displayName: user?.displayName, email: user?.email, photoURL: user?.photoURL, liked: true, like: 0, comment:0, share:0, paragraph, postImage: imageUploadServer, created: new Date()};
+ const data = {displayName: user?.displayName, email: user?.email, photoURL: user?.photoURL, userLiked: [{ email: user?.email}], like: 0, comment:0, share:0, paragraph, postImage: imageUploadServer, created: new Date()};
 
-      fetch("http://localhost:5000/posts/", {
+      fetch("https://social-media-site-server.vercel.app/posts/", {
         method: "POST",
         headers: {
           "content-type": "application/json"
