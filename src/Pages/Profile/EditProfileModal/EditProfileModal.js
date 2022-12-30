@@ -14,7 +14,6 @@ const EditProfileModal = ({ modal, setModal }) => {
       .then((res) => res.json())
       .then((data) => setUserInfo(data[0]));
   }, [user?.email]);
-  console.log("u", userInfo)
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;

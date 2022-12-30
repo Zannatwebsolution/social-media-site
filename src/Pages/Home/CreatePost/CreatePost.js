@@ -2,18 +2,23 @@ import React, { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
 import { AuthContext } from "../../../context/AuthProvider";
 import { ImgUpload } from "../../../hooks/ImgUpload";
+import Loader from "../../SharePage/Loader/Loader";
 
 const CreatePost = () => {
   const {user} = useContext(AuthContext)
   const [paragraph, setParagraph] = useState();
   const [image, setImage] = useState();
   const [openModal, setOpenModal] = useState(true)
+  const [loading, setLoading] = useState(false);
   
   const handlePost = async ()=>{
+    setLoading(true)
     if(!paragraph && !image ){
       return toast.error("Please add text or image")
     }
-    
+    if(loading){
+      <Loader></Loader>
+    }
     const formData = new FormData();
     formData.append("image", image);
     let imageUploadServer;
@@ -22,7 +27,7 @@ const CreatePost = () => {
     }else{
        imageUploadServer = "";
     }
- const data = {displayName: user?.displayName, email: user?.email, photoURL: user?.photoURL, userLiked: [{ email: user?.email}], like: 0, comment:0, share:0, paragraph, postImage: imageUploadServer, created: new Date()};
+ const data = {displayName: user?.displayName, email: user?.email, photoURL: user?.photoURL, userLiked: [], like: 0, comment:0, share:0, paragraph, postImage: imageUploadServer, created: new Date()};
 
       fetch("https://social-media-site-server.vercel.app/posts/", {
         method: "POST",
@@ -39,6 +44,7 @@ const CreatePost = () => {
           toast.success("Created Post Successful");
           setParagraph("");
           setImage("");
+          setLoading(false)
         }
       })
       .catch(()=>toast.error("Create Post Fail"))
@@ -123,7 +129,7 @@ const CreatePost = () => {
                   </div>
                   <div className="publish-post p-5">
                       <button className="p-3 rounded-lg w-full bg-[#1A6ED8] text-white font-medium" onClick={handlePost}>
-                       Post
+                        {loading ? "Creating Post...": "Post"}
                       </button>
                   </div>
                 </div>

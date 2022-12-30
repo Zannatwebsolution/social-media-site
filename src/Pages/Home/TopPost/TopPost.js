@@ -9,7 +9,7 @@ const TopPost = () => {
   const { data: topPost = [], refetch, isLoading } = useQuery({
   queryKey: ["topPost", user ],
   queryFn: async () => {
-    const res = await fetch(`https://social-media-site-server.vercel.app/posts`, {
+    const res = await fetch(`https://social-media-site-server.vercel.app/top-posts`, {
       headers: {
         authorization: `${localStorage.getItem("token")}`,
     }

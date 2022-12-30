@@ -9,6 +9,7 @@ import Profile from "../Pages/Profile/Profile"
 import EditProfileModal from "../Pages/Profile/EditProfileModal/EditProfileModal"
 import Media from "../Pages/Media/Media"
 import PrivateRoute from "./PrivateRoute/PrivateRoute"
+import PostDetail from "../Pages/PostDetail/PostDetail"
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
             {
                 path: "/media",
                 element: <PrivateRoute><Media></Media></PrivateRoute>
+            },
+            {
+                path: "/post/:id",
+                element: <PostDetail></PostDetail>
             },
             {
                 path: "/edit-profile",

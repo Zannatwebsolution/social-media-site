@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthProvider';
 
-const Post = ({data, refetch}) => {
+const Post = ({data, refetch, hideButton}) => {
   // const {_id: id} = data;
   
   // console.log(id)
@@ -76,6 +77,9 @@ const Post = ({data, refetch}) => {
   
   }
 
+  const seeMoreHandler = (data)=>{
+console.log(data._id)
+  }
     return (
         <div className="container mx-auto shadow-xl border my-5">
         <div className="post">
@@ -95,9 +99,11 @@ const Post = ({data, refetch}) => {
             </div>
           </div>
           <div className="post-content px-5">
-            <p>
-              {data?.paragraph}
-            </p>
+            {!hideButton && <p>
+              {data?.paragraph?.length > 150 ? data?.paragraph.slice(0,150) : data?.paragraph}
+            </p>}
+            {hideButton && data?.paragraph}
+            {hideButton ? "" : data?.paragraph?.length > 150 &&  <Link to={`./../post/${data._id}`} className='btn' onClick={()=>seeMoreHandler(data)}> See More</Link>}
           </div>
           <div className="post-image py-5">
             <img
@@ -121,7 +127,7 @@ const Post = ({data, refetch}) => {
           </div>
           <div className="post-share flex justify-around py-5 border-t border-slate-300">
             <div className="like">
-              <button className={userLikeInfo?.liked === true ? "btn": "btn btn-primary"} onClick={()=>onSelect()}>
+              <button className={userLikeInfo?.liked === true ? "btn btn-primary" : "btn"} onClick={()=>onSelect()}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
