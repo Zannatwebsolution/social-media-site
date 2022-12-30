@@ -14,6 +14,7 @@ const CreatePost = () => {
   const handlePost = async ()=>{
     setLoading(true)
     if(!paragraph && !image ){
+      setLoading(false)
       return toast.error("Please add text or image")
     }
     if(loading){
@@ -47,7 +48,10 @@ const CreatePost = () => {
           setLoading(false)
         }
       })
-      .catch(()=>toast.error("Create Post Fail"))
+      .catch(()=>{
+        setLoading(false)
+        toast.error("Create Post Fail")
+      })
       
   }
   return (
